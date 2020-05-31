@@ -1,178 +1,49 @@
+## Resources of Scala
 
-#### https://docs.scala-lang.org/tour/tour-of-scala.html
-
-#### ============================================
-## Part 1
-#### ============================================
-scala is **pure OO** --> every value is an object <br>
-**types and behaviors** of objects are described by **classes and traits** <br>
-Classes can be **Extended by subclassing** <br>
-**mixin-based composition** replaces multiple inheritance 
+#### Guides:
+1. [Alvin Alexander's hello-scala](https://hello-scala.com/)
+2. [Scala best practices](https://nrinaudo.github.io/scala-best-practices/)
+3. [Scala exercises](https://www.scala-exercises.org/)
 
 
-
-scala is functional --> **every function is a value** <br>
-support for **currying, higher order functons, singelton objects, pattern matching, nested functions, for comprehensions, extractor objects, and case classes**
-
-
-#### ============================================
-## Part 2
-#### ============================================
-
-**named results --> values** --> `val x = 1`
-
-**Variables are like values**, except you can re-assign them <br>
-`var x = 1`
-
-**combine expressions** by surrounding them with `{}` <br>
-`println({`<br>
-  `val x = 1 + 1` <br>
-  `x + 1 })`
-
-**lambda functions** `(x: Int) => x + 1` <br>
-**named functions** `val add = (x: Int, y: Int) => x + y + 1` <br>
-
-**methods vs. functions**
-https://tpolecat.github.io/2014/06/09/methods-functions.html
-- eta expansion --> methods as function values
-- methods can have multiple parameter lists
-`def add(x: Int, y: Int): Int = x + y`
+#### Misc. 
+1. How Scala’s source code is interpreted by the compiler to produce efficient and effective [JVM bytecode](https://www.toptal.com/scala/scala-bytecode-and-the-jvm)
+  - Brief overview of some major elements of the Java Virtual Machine architecture, class file structure, and assembler basics.
+  - decompiling class files with javap
+  - Constant pool, field and method table
+  - javap; translates bytecode into human readable form --> javap -p -c RegularPolygon.class
+  - methods in class file organized in call stack, each compiled as a stack frame (operand stack and local variable frame)
+2. [Scala Internals](https://medium.com/@alessandroheres/scala-internals-and-intermediates-483e654bb6d2)
+  - how JVM implements the Scala functions 
+3. [Sealed Traits](https://underscore.io/blog/posts/2015/06/02/everything-about-sealed.html)
+  - algebraic data types --> a complex definition is just an algebraic data type — it is defined entirely in terms of ands and ors.
+4. [Re-learn SBT](https://kubuszok.com/2018/relearn-your-sbt/)
+  - naming each .sbt file build.sbt in a multimodule project a cargo-cult programming. If you give each of these files a meaningful name, it will be easier to fast-navigate, or pinpoint which file errored on sbt start
+  - leave the build.sbt name for our root project
+  -  version.sbt file which only contains version := "value" makes it easier to do a version bump programmatically
+5. [Understanding SBT](http://www.beyondthelines.net/computing/understanding-sbt/)
+  - written in plain scala, so must be compiled --> build.sbt
+6. [Option/Some/None Pattern](https://alvinalexander.com/scala/best-practice-option-some-none-pattern-scala-idioms/)
+  - Option is a collection with zero or one elements
+  - access values in Option with 1) getOrElse 2) foreach 3) match expr
+  - working with collections, bag.map(toInt).flatten, or, bag.map(toInt).collect{case Some(i) => i}
 
 
-**Classes**
-`class Greeter(prefix: String, suffix: String) {` <br>
-`  def greet(name: String): Unit = ` <br>
-`    println(prefix + name + suffix)  }`
-
-- return type: **Unit** --> nothing meaningful to return...caries no info 
-- use **new** to instantiate class <br>
-`val greeter = new Greeter("Hello, ", "!")`
-
-
-
-**Case Classes: FP**
-- plain and immutable data-holding objects that should exclusively depend on their constructor arguments
-- instances of cc are immutable by default
-- compared by value, whereas class instances are compared by reference --> useful for pattern matching
-
-`case class Point(x: Int, y: Int)` <br>
-- You can instantiate case classes without the new keyword:
-`val point = Point(1, 2)`
-- instances of case classes are compared by value, not by reference:
+#### FP
+1. [What FP is all about](https://www.lihaoyi.com/post/WhatsFunctionalProgrammingAllAbout.html)
+  - imperative paradigm issues: 
+    - there is an ordering of steps, but the ordering between only some is required
+    - instructions are based on changing the state of things, but evidence of this is hidden
+    - dependencies become difficult to track 
+  - core of Functional Programming is thinking about data-flow rather than control-flow
+  - what really matters is the shape of the data-flow graph, we can freely re-arrange the statements in the code, and the order of execution, as long as the graph shape is preserved
 
 
-**Objects**
-- single instances of own definitions
-- singletons of their own classes
-
-`object IdFactory { `<br>
-`  private var counter = 0` <br>
-`  def create(): Int = { `<br>
-`    counter += 1 `<br>
-`    counter ` <br>
-`  }  } `
-
-- access object by referring to its name 
-`val newId: Int = IdFactory.create()`
-
-
-**Traits**
-- abstract data types with fields and methods 
-- Scala inheritance: a class can only extend one other class, but it can extend **multiple traits**
-
-~~~
-trait Greeter {
-  def greet(name: String): Unit
-}
-~~~
-
-**extends and override: Traits**
-~~~
-class DefaultGreeter extends Greeter
-
-class CustomizableGreeter(prefix: String, postfix: String) extends Greeter {
-  override def greet(name: String): Unit = {
-    println(prefix + name + postfix)
-  }
-}
-
-val greeter = new DefaultGreeter()
-greeter.greet("Scala developer") // Hello, Scala developer!
-
-val customGreeter = new CustomizableGreeter("How are you, ", "?")
-customGreeter.greet("Scala developer") // How are you, Scala developer?
-~~~
-
-**Main Method**
-- JVM requires a main method, named main
-- takes one argument, an array of strings
-
-~~~
-object Main {
-  def main(args: Array[String]): Unit =
-    println("Hello, Scala developer!")
-}
-~~~
-
-#### ============================================
-## Part 3: Unified Types
-#### ============================================
-
-**type hierarchy**
-- all values have a type
-- **Any** is supertype of a ll types --> defines universal methods like equals, hashCode, etc.
-- Any two direct subclasses --> 1) AnyVal 2) AnyRef
-- **AnyVal** represents value types
-- **AnyRef** represents reference types --> all non value types
-- exanoke of Any:
-~~~
-val list: List[Any] = List(
-  "a string",
-  732,  // an integer
-  'c',  // a character
-  true, // a boolean value
-  () => "an anonymous function returning a string"
-)
-~~~
-
-
-**Type Casting**
-- Casting is **unidirectional**
-
-**Nothing and Null**
-- Nothing is a subtype of all types --> the botton type
-- no value has type Nothing
-- **Null** is a subtype of all reference types (AnyRef) --> **rarely used**
-
-
-#### ============================================
-## Part 4: Defining a class
-#### ============================================
-
-- **new** used to create instance of class
-
-~~~
-class Point(var x: Int, var y: Int) {
-
-  def move(dx: Int, dy: Int): Unit = {
-    x = x + dx
-    y = y + dy
-  }
-
-  override def toString: String =
-    s"($x, $y)"
-}
-
-val point1 = new Point(2, 3)
-point1.x  // 2
-println(point1)  // prints (2, 3)
-~~~
-
-- class members include variables and methods
-- **the class constructor** is the **class signature** --> `(var x: Int, var y: Int)`
-
-**Constructors**
-
-
-
-
+#### Other
+- https://medium.com/@bfortuner/python-multithreading-vs-multiprocessing-73072ce5600b
+- https://medium.com/mop-developers/parallel-computing-in-python-and-scala-37d3561b4c08
+- https://www.lihaoyi.com/post/EasyParallelProgrammingwithScalaFutures.html
+- https://www.lihaoyi.com/post/HowtoworkwithSubprocessesinScala.html
+- https://jobs.zalando.com/en/tech/blog/parallel-computing-with-scala/?gh_src=4n3gxh1%3Fgh_src%3D4n3gxh1
+- https://stackoverflow.com/questions/231767/what-does-the-yield-keyword-do
+- 
